@@ -1,15 +1,19 @@
 MarginalDens <-
 function(rhoarray,p)
 {
- # we suppose that the number of grid point is the same along all directions = n
- n <- dim(rhoarray)[1]
+ n <- dim(rhoarray)
  m<- length(dim(rhoarray))
  Xgrid <-gridpmp(m,p,n)
- print('Xgrid...')
- print(Xgrid)
-
+ 
+ if (length(Xgrid$mp) == 0)
+ {
+  out<-lapply(rhoarray, function(i) list(mpp=1, p=i))
+ } else
+ {
  out <- lapply(seq(nrow(Xgrid$p)), 
         function(i) 
-        normalise(rhoarray[convert(combinepmp(Xgrid$mp, Xgrid$p[i,, drop=FALSE]),n)]))
+        normalise(na.fail(rhoarray[convert(combinepmp(Xgrid$mp, 
+                  Xgrid$p[i,, drop=FALSE]),n)])))
+ }
  return(list(grid=Xgrid, marginals=out))
 }

@@ -1,7 +1,6 @@
 varanal <-
 function( E, rhoarray, x, p)
 {
-  test <-  FALSE
   cgen <- function(x) { 
              OUT = GP_P(E,x, calc_var=TRUE, extra_output=TRUE)
              list(cxx = OUT$cxx, hht = OUT$hht,  htt = OUT$htt,  ttt = OUT$ttt ) }
@@ -30,7 +29,7 @@ function( E, rhoarray, x, p)
   tr <- function(x) sum(diag(x))
 
   emulator_variance <- E$sigma_hat_2 * ( Up - tr(solve(A, Pp)) +
-                       tr( solve( Winv,  (Qp - Sp %*% solve(A,H) + t(H) %*% solve(A, t(Sp)) + 
+                       tr( solve( Winv,  (Qp - Sp %*% solve(A,H) - t(H) %*% solve(A, t(Sp)) + 
                                t(H) %*% solve (A, Pp)%*% solve ( A, H))) ))
 
   betahat <- E$betahat
@@ -43,8 +42,9 @@ function( E, rhoarray, x, p)
   squared_mean <- (Rp %*% betahat + Tp %*% e ) ^2
   # the above is not entirely correct. This is  ( E*(E(Y)) )^2 whil we need
   # E* ( E^2(Y) ). Need to correct with variances as given in the top formula
-  # of p. 761
+  # of p. 761, in fact naturally obtained when the users choses 'NULL' as the 'p'
+  # space. 
 
   OUT <- list ( ev = emulator_variance, sv = simulator_variance, sm = squared_mean ) 
-
+  OUT
 }

@@ -45,10 +45,10 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     ## in the notation Oakley OHagan : 
 
    
-    cxx = rr -  t(r) %*% solve ( Rt, r ) + 
+    cxx_star = rr -  t(r) %*% solve ( Rt, r ) + 
              ( P  %*% solve ( (t(muX) %*% R1tX )  ,  t(P) ) )
 
-    Sp = kronecker(cxx,sigma_hat_2) 
+    Sp = kronecker(cxx_star,sigma_hat_2) 
     Sp_diag = diag(Sp)
     
     if (extra_output)
@@ -56,7 +56,7 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     # general sensitivity analysis after Oakley and Ohagan
     # attention : our ht is the transpose of their 'h', but
     # easier for the calculations that will follow
-    Emul_pred = list(yp=yp, S=cxx, Sp=Sp, Sp_diag = Sp_diag, cxx=cxx, r=r, ht=mux, 
+    Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, cxx=rr, r=r, ht=mux, 
                      hht = aperm(t(mux)  %o% mux , c(2,3,1,4) ),
                      htt = aperm(t(mux)  %o% t(r) , c(2,3,1,4)) , 
                      ttt = aperm(r    %o% t(r)  , c(2,3,1,4)) )  

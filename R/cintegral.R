@@ -4,7 +4,7 @@ function(rhoarray, X, cgen, p)
  # X is the expanded grid filling space (assuming equal weights)
  # cgen is the outer generator 
  # rhoarray is an array of scalars
- n <- dim(rhoarray)[1]
+ n <- dim(rhoarray)
  m <- length(dim(rhoarray))
  
  lsum <- function(x) 
@@ -74,7 +74,7 @@ function(rhoarray, X, cgen, p)
            marginal <- Xgrid$p[ip,]
            names(marginal) <- colnames(Xgrid$p)
            grid <- convert(combinepmp(Xgrid$mp, Xgrid$p[ip,, drop=FALSE]),n)
-           ccmatrix   <- cgen(X[grid,, drop=FALSE])                 # generates matrix
+           ccmatrix   <- cgen(X[na.fail(grid),, drop=FALSE])                 # generates matrix
            genmatrix(ccmatrix, ip)
 
    } ) ) 
