@@ -39,8 +39,9 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     # see email to Adrianikis and Challenor 5.08.2013 without response
     # whether one hould use R1X (i. e. : A-1) or R1tx (i. e. Atilde - 1)
     # new email on 22 august
-
-    P  <- ( mux - t(r) %*% R1X )
+    # ok. response on 9 septembre : Must use Atilde. 
+    # equation modified accordingly
+    P  <- ( mux - t(r) %*% R1tX )
 
     ## in the notation Oakley OHagan : 
 
