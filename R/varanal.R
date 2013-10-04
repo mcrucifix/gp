@@ -1,8 +1,11 @@
-varanal <-
+varanal_deprecated <-
 function( E, rhoarray, x, p)
   # as it is: high inefficiency due to the computation of very big
   # arrays which are, in fact, sparse (or at least dominated by a 
   # few elements (arrays computed within  GP_P)
+  # NOTA : deprecated from version 0.1.2
+  # as too inefficient. Replaced by varanal_fast
+ 
   {
   cgen <- function(x) { 
              OUT = GP_P(E,x, calc_var=TRUE, extra_output=TRUE)

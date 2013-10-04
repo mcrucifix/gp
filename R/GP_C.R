@@ -1,6 +1,8 @@
 # overloads exp function for creation of sparse matrices
-# to do : this needs to be set as an option
-exp <- function(x) Vectorize({ifelse(x<(-2), 0, .Primitive("exp")(x)) })
+# commented out on
+# Fri Oct  4 14:33:38 CEST 2013 as at the end
+# we won't use sparse matrices
+# exp <- function(x) Vectorize({ifelse(x<(-2), 0, .Primitive("exp")(x)) })
 
 cov_mat	= function(lambda=lambda,X1=X1,X2=X2, covar=exp)
 {
@@ -31,7 +33,10 @@ cov_mat_1 = function(lambda=lambda,X1=X1,X2=X2, covar=exp)
 
 
 GP_C <-
-function( X, Y ,lambda, regress='linear' )
+function( X, Y ,lambda, regress='linear', covar=exp )
+  # revision history
+  # 4.10.2013 : added covar option + passed in output.
+  #             Backward campatible.
 {
   funcmu = get(sprintf('funcmu_%s',regress))
   if  ( ! is.function(funcmu)) stop ('invalid regression model')
@@ -48,7 +53,7 @@ function( X, Y ,lambda, regress='linear' )
 	nbr  <- n - ncol(X)
 	nbrr <- n - ncol(X) - 2 
 	
-	R   <- cov_mat(lambda,X,X) 
+	R   <- cov_mat(lambda,X,X,covar) 
   R1X <- solve(R,muX) # for P matrix, disgarding the nugget
 
   # apply nugget (a la Andrianakis et Challenor)
@@ -93,8 +98,9 @@ function( X, Y ,lambda, regress='linear' )
 
 
   EM_Cali = list(betahat=betahat, sigma_hat_2=sigma_hat_2, 
-                 R=R, Rt = Rt,  muX=muX, X=X, Y=Y, lambda=lambda, e=e,
-                 funcmu=funcmu, R1X=R1X, R1tX=R1tX , log_REML = log_REML, log_pen_REML=log_pen_REML)
+                 R=R, Rt = Rt,  muX = muX, X=X, Y=Y, lambda=lambda, e=e,
+                 funcmu=funcmu, R1X = R1X, R1tX=R1tX , log_REML = log_REML, 
+                 log_pen_REML=log_pen_REML, covar = covar )
 
 	return(EM_Cali)
 }
