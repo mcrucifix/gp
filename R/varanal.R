@@ -1,6 +1,9 @@
 varanal <-
 function( E, rhoarray, x, p)
-{
+  # as it is: high inefficiency due to the computation of very big
+  # arrays which are, in fact, sparse (or at least dominated by a 
+  # few elements (arrays computed within  GP_P)
+  {
   cgen <- function(x) { 
              OUT = GP_P(E,x, calc_var=TRUE, extra_output=TRUE)
              list(cxx = OUT$cxx, hht = OUT$hht,  htt = OUT$htt,  ttt = OUT$ttt ) }
@@ -40,11 +43,18 @@ function( E, rhoarray, x, p)
 
 
   squared_mean <- (Rp %*% betahat + Tp %*% e ) ^2
-  # the above is not entirely correct. This is  ( E*(E(Y)) )^2 whil we need
-  # E* ( E^2(Y) ). Need to correct with variances as given in the top formula
-  # of p. 761, in fact naturally obtained when the users choses 'NULL' as the 'p'
-  # space. 
+  # this is the squared mean associated with the simulator variance
+  # i.e.  ( E*(E(Y)) )^2. 
+  # However we also need 
+  # E* ( E^2(Y) ),  to be subtracted from 'ev'. 
+  # This quantity involves an integral of the covariance
+  # structure over the whole domain, and  is
+  # naturally obtained when the users choses 'NULL' as the 'p'
+  # space. This is, though, _extremely_ computing expensive. 
+  # so we don't want the user to compute this for every combinations
+  # of the 'p'. 
+  # this seems  however to be the only solution. 
 
-  OUT <- list ( ev = emulator_variance, sv = simulator_variance, sm = squared_mean ) 
+  OUT <- list ( ev = emulator_variance, sv = simulator_variance -  squared_mean ) 
   OUT
-}
+  }

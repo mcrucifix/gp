@@ -7,10 +7,6 @@ function(x,y, h, omega)
  names(r) <- c('x','y','z')
  midvalue <- function(x) {(x[-length(x)] + x[-1])/2.}
  newgrid <- as.data.frame(apply(x,2,midvalue))
- print('newgrid')
- print(newgrid)
- print('dimy')
- print(dim(y))
  new_egrid <- lapply(expand.grid(newgrid), function(i) array(i,dim(y)-1))
 
 

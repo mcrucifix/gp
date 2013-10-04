@@ -1,3 +1,13 @@
+# to do : 
+# import sparse matrix calculation
+# add a s_sum (trivial)
+# then check if ccmatrix, returned by cgen, is of class sparsematrix
+# if yes, then override the sweep by s_sweep and in isum, 
+# override apply by s_apply and sum by s_sum
+# override exp calculation in cov_mat to indeed generate sparse matrices,...
+# and that should do it ! 
+# M. Crucifix  Wed Oct  2 23:31:12 CEST 2013
+
 cintegral <-
 function(rhoarray, X, cgen, p)
 {
@@ -19,9 +29,9 @@ function(rhoarray, X, cgen, p)
         } else 
         {
         sapply(inames, 
-         function(iname) 
+          function(iname) 
           { 
-            out <- rsum( sapply(x, function(x) {x[[iname]] } ) ) 
+            out <- rsum( sapply( x, function(x) { x[[iname]] } ) ) 
             ishape <- shapes[[iname]]
             if (! is.null (ishape)) array(out, ishape) else out 
           } , 
@@ -34,20 +44,23 @@ function(rhoarray, X, cgen, p)
    ## over -p|p
    ## which will then need  to be intgrated over rho_p
    {
-    rhorhomatrix  <- outer(as.numeric(rho[[ip]]$mpp), 
-                            as.numeric(rho[[ip]]$mpp))   # matrix
-    if (is.list(ccmatrix))
+     rhorhomatrix  <- outer(as.numeric(rho[[ip]]$mpp), 
+                             as.numeric(rho[[ip]]$mpp))   # matrix
+     if (class(ccmatrix) == "list")
        # if ccmatrix is a list, it must be named ! 
+       # use the above rather than 'is.list' because
+       # a sparseMatrix is also a list
        { 
-       sapply ( ccmatrix, function(ccmatrix) 
-               {  
-                  isum(sweep(ccmatrix, c(1,2), rhorhomatrix,"*") ) *rho[[ip]]$p 
-               },
-              USE.NAMES=TRUE, simplify=FALSE)
+         sapply ( ccmatrix, function(ccmatrix) 
+           {  
+            isum(s_sweep(ccmatrix, 
+                         c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
+           },
+           USE.NAMES=TRUE, simplify=FALSE)
        }
        else 
        {
-          isum(sweep(ccmatrix, c(1,2), rhorhomatrix,"*") ) *rho[[ip]]$p 
+         isum(s_sweep(ccmatrix, c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
        }
    }
 
@@ -61,22 +74,22 @@ function(rhoarray, X, cgen, p)
 
  } else 
  {
-
    rho <- MarginalDens(rhoarray,p)
    Xgrid <- rho$grid
    rho <- rho$marginals
    lsum   ( 
-   #that's the double integral for all elements of space p
-   # should result in a vector of scalars
-    lapply(seq(nrow(Xgrid$p)), 
-    function(ip) 
-         {  
-           marginal <- Xgrid$p[ip,]
-           names(marginal) <- colnames(Xgrid$p)
-           grid <- convert(combinepmp(Xgrid$mp, Xgrid$p[ip,, drop=FALSE]),n)
-           ccmatrix   <- cgen(X[na.fail(grid),, drop=FALSE])                 # generates matrix
-           genmatrix(ccmatrix, ip)
-
-   } ) ) 
+     # that's the double integral for all elements of space p
+     # should result in a vector of scalars
+     lapply(seq(nrow(Xgrid$p)), 
+       function(ip) 
+       {  
+         marginal <- Xgrid$p[ip,]
+         names(marginal) <- colnames(Xgrid$p)
+         grid <- convert(combinepmp(Xgrid$mp, Xgrid$p[ip,, drop=FALSE]),n)
+         ccmatrix   <- cgen(X[na.fail(grid),, drop=FALSE])    
+         # generates matrix
+         genmatrix(ccmatrix, ip)
+        }
+     ) ) 
  }
 }

@@ -53,17 +53,32 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     Sp_diag = diag(Sp)
     
     if (extra_output)
-    # extra output useful to compute the triple integrals fro
-    # general sensitivity analysis after Oakley and Ohagan
-    # attention : our ht is the transpose of their 'h', but
-    # easier for the calculations that will follow
-    Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, cxx=rr, r=r, ht=mux, 
-                     hht = aperm(t(mux)  %o% mux , c(2,3,1,4) ),
-                     htt = aperm(t(mux)  %o% t(r) , c(2,3,1,4)) , 
-                     ttt = aperm(r    %o% t(r)  , c(2,3,1,4)) )  
-                  #   )
+    {
+      # extra output useful to compute the triple integrals fro
+      # general sensitivity analysis after Oakley and Ohagan
+      # attention : our ht is the transpose of their 'h', but
+      # easier for the calculations that will follow
+
+      # output sparse matrices for cxx, htt, ttt
+      # to do : this needs to be an option
+      # i believe that for hht this may be counterproductive
+      # or also if lambda is large so that in practice there are
+      # little excluded points, or at last if the 
+      # user does not cut exponential tails
+      # to do: select sparse matrix or dense matrix
+      # depending on th proportion of zeros in r. 
+      
+      tr <- a2s(t(r))
+      tmux <- a2s(t(mux))
+      Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, r=r, ht=mux, 
+                       cxx = rr, 
+                       hht = aperm ( outer(t(mux), mux) , c(2,3,1,4) ),
+                       htt = s_aperm(s_outer(tmux, tr ), c(2,3,1,4)) , 
+                       ttt = s_aperm(s_outer(a2s(r), tr )  , c(2,3,1,4))   
+                       )
+    }
     else
-    Emul_pred = list(yp=yp, S=cxx, Sp=Sp, Sp_diag = Sp_diag)
+    Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag)
 
   } else
   {

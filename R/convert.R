@@ -8,7 +8,6 @@ enpower <- function(n, i) {
 convert <-
 function(X, n) 
   { nc = ncol(X)
-    print(nc)
     if (nrow(X) > 1)
      return (rowSums(sapply(seq(nc), function(i) enpower(n, i) * (X[[i]]-1) )) +1 )
     else
