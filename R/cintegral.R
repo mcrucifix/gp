@@ -46,22 +46,29 @@ function(rhoarray, X, cgen, p)
    {
      rhorhomatrix  <- outer(as.numeric(rho[[ip]]$mpp), 
                              as.numeric(rho[[ip]]$mpp))   # matrix
-     if (class(ccmatrix) == "list")
-       # if ccmatrix is a list, it must be named ! 
-       # use the above rather than 'is.list' because
-       # a sparseMatrix is also a list
-       { 
-         sapply ( ccmatrix, function(ccmatrix) 
-           {  
-            isum(s_sweep(ccmatrix, 
-                         c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
-           },
-           USE.NAMES=TRUE, simplify=FALSE)
-       }
-       else 
-       {
-         isum(s_sweep(ccmatrix, c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
-       }
+     if (length(rhorhomatrix)  == 1)
+     {
+       # if rhorhomatrix is a simple scalar, just execute multiplication
+       return(sapply(ccmatrix, function(i) i*rhorhomatrix * rho[[ip]]$p))
+     } else
+     {
+       if (class(ccmatrix) == "list")
+         # if ccmatrix is a list, it must be named ! 
+         # use the above rather than 'is.list' because
+         # a sparseMatrix is also a list
+         { 
+           sapply ( ccmatrix, function(ccmatrix) 
+             {  
+              isum(s_sweep(ccmatrix, 
+                           c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
+             },
+             USE.NAMES=TRUE, simplify=FALSE)
+         }
+         else 
+         {
+           isum(s_sweep(ccmatrix, c(1,2), rhorhomatrix,"*") ) * rho[[ip]]$p 
+         }
+     }
    }
 
  if (is.null(p))
