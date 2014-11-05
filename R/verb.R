@@ -9,8 +9,7 @@ function (fname, expr=expr, verbose=NULL)
    else if ( exists('verbose', .GlobalEnv ))
    # try to catch it from the global environment
     { verbose = get('verbose', .GlobalEnv) }
-   else break ('verbose must be defined either in the GlobalEnv, in the
-                environment of the calling function, or as a parameter ')
+   else verbose = FALSE
   } 
   if (verbose) 
         {

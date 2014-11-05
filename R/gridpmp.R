@@ -7,7 +7,10 @@ function(m,pin,n)
   # n is a tuple with number of rows
 
   cX <-  seq(m)
-  p <- list(p=pin, mp=cX[-pin])
+  if (is.null(pin))
+    p <- list(p=NULL, mp=cX)
+  else
+    p <- list(p=pin, mp=cX[-pin])
   # 
   p <- lapply(p, function(p) { p; names(p)=p; p} )
   l <- lapply(p,length)

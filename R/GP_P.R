@@ -6,7 +6,9 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
   if (! is.matrix(x)) x=as.matrix(x)
   X <- EM_Cali$X
   Y <- EM_Cali$Y
+  # the Rt includes the nugget 
   R <- EM_Cali$R
+  e <- EM_Cali$e
   Rt <- EM_Cali$Rt
   R1X  <- EM_Cali$R1X
   R1tX <- EM_Cali$R1tX
@@ -34,7 +36,7 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
                      } else {cov_mat(lambda,X,x,covar)}
 
   yp_mean = mux %*% betahat 
-  yp_gaus = t(r) %*% solve ( Rt,  (Y- muX %*% betahat) )
+  yp_gaus = t(r) %*% e
 
   yp = yp_mean + yp_gaus 
 
@@ -59,7 +61,6 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     Sp = cxx_star * as.numeric(sigma_hat_2)
 
     Sp_diag = diag(Sp)
-    
     if (extra_output)
     {
       # extra output useful to compute the triple integrals fro
@@ -81,14 +82,15 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
       # computing time : theses output are not used for
       # varanal_fast (which was verified to produce the same
       # output as varanal). 
-
-      tr <- a2s(t(r))
-      tmux <- a2s(t(mux))
-      Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, r=r, ht=mux, 
+ 
+      mux = as.matrix(mux)
+      r = as.matrix(r)
+      Emul_pred = list(yp=yp, yp_mean=yp_mean, yp_gaus=yp_gaus, Sp=Sp, Sp_diag = Sp_diag, r=r, ht=mux, 
                        cxx = rr, 
+                       cxx_star = cxx_star,
                        hht = aperm ( outer(t(mux), mux) , c(2,3,1,4) ),
-                       htt = s_aperm(s_outer(tmux, tr ), c(2,3,1,4)) , 
-                       ttt = s_aperm(s_outer(a2s(r), tr )  , c(2,3,1,4))   
+                       htt = aperm(outer(t(mux), t(r) ), c(2,3,1,4)) , 
+                       ttt = aperm(outer(r, t(r) )  , c(2,3,1,4))   
                        )
     }
     else 

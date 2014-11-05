@@ -100,7 +100,7 @@ function( X, Y ,lambda, regress='linear', covar=exp )
   EM_Cali = list(betahat=betahat, sigma_hat_2=sigma_hat_2, 
                  R=R, Rt = Rt,  muX = muX, X=X, Y=Y, lambda=lambda, e=e,
                  funcmu=funcmu, R1X = R1X, R1tX=R1tX , log_REML = log_REML, 
-                 log_pen_REML=log_pen_REML, covar = covar )
+                 log_pen_REML=log_pen_REML, covar = covar, nbrr=nbrr )
 
 	return(EM_Cali)
 }
