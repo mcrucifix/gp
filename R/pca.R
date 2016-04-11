@@ -1,3 +1,5 @@
+meanrm <- function (x) mean (x, na.rm=TRUE) 
+
 pca <-
 function(A)
 {
@@ -8,16 +10,20 @@ function(A)
   A = matrix(A, nlon*nlat, nr)
 
   mean = apply(A,1,mean)
-  Am = sweep(A,1, apply(A,1,mean))
+  Am = sweep( A,1, mean ) 
 
-  o = which(! is.na(Am[,1]))
+  o = which( ! is.na (mean ) )
 
   U = svd(Am[o,])
 
-  O = A; V=A
+  O = A*NA 
+  V = O 
   O[o,] = U$u
 
   O = array(O, c(nlon,nlat,nr))
+
+  # reformatting 
+
   mean = matrix(mean, nlon, nlat)
 
   d     = U$d

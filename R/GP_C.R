@@ -54,7 +54,7 @@ function( X, Y ,lambda, regress='linear', covar=exp )
 	nbrr <- n - ncol(X) - 2 
 	
 	R   <- cov_mat(lambda,X,X,covar) 
-  R1X <- solve(R,muX) # for P matrix, disgarding the nugget
+  # R1X <- solve(R,muX) # for P matrix, disgarding the nugget
 
   # apply nugget (a la Andrianakis et Challenor)
   Rt   <- R + diag(n) * lambda$nugget
@@ -99,8 +99,21 @@ function( X, Y ,lambda, regress='linear', covar=exp )
 
   EM_Cali = list(betahat=betahat, sigma_hat_2=sigma_hat_2, 
                  R=R, Rt = Rt,  muX = muX, X=X, Y=Y, lambda=lambda, e=e,
-                 funcmu=funcmu, R1X = R1X, R1tX=R1tX , log_REML = log_REML, 
+                 funcmu=funcmu, # R1X = R1X, 
+                 R1tX=R1tX , log_REML = log_REML, 
                  log_pen_REML=log_pen_REML, covar = covar, nbrr=nbrr )
 
+  attr(EM_Cali, "class") <-  "GP_Emul"
 	return(EM_Cali)
 }
+
+
+BIC.GP_Emul <- function(E) 
+  {
+    k <- with(E, length(lambda$theta) + length(lambda$nugget))
+    n <- with(E, length(Y) )
+    bic <- with (E,  -2 * log_REML +  k * (log ( n ) - log ( 2 * pi ) )  )
+    return(bic)
+  }
+
+logLik.GP_Emul <- function(E) E$log_REML

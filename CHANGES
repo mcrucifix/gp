@@ -1,1 +1,7 @@
+0.1.5 : BUG FIX !!! In the computation of the likelihood : the multiplying
+        factor of log(sigma) is (n-q) where q is the number of column
+        of regressors, not X. It is quite likely without much consequence
+        on previously published results. 
+        GP_E now generates a class, associated with bic and lik functions
+0.1.5 : pca : check that all elements of all experiemnts are !na
 0.1.3 : dropped parameter 'x' in varanal 

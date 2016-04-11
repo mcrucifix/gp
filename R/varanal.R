@@ -61,4 +61,3 @@ varanal <- function( E, rhoarray, p, method = 'deterministic')
   OUT 
 }
 
-

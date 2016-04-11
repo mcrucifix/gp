@@ -10,7 +10,7 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
   R <- EM_Cali$R
   e <- EM_Cali$e
   Rt <- EM_Cali$Rt
-  R1X  <- EM_Cali$R1X
+  #R1X  <- EM_Cali$R1X
   R1tX <- EM_Cali$R1tX
   covar  <- EM_Cali$covar
 
@@ -43,7 +43,16 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
   if (calc_var) # do we need the full output covariance matrix ? 
   {
     rr <-  if ((nx)==1) {1}   else {cov_mat(lambda,x ,x,covar)}
+
     rr <- rr + diag(nx) * lambda$nugget
+    # correction : the nugget must not only be added to the diag, but in fact
+    # to any couple of inputs that would be identical 
+
+    Ind = cbind(which(duplicated(x)),nrow(x)+1-which(duplicated(apply(x, 2, rev) )))
+    Ind = rbind(Ind, Ind[, c(2,1)])
+    rr[Ind] = rr[Ind] + lambda$nugget 
+
+
 
     # see email to Adrianikis and Challenor 5.08.2013 without response
     # whether one hould use R1X (i. e. : A-1) or R1tx (i. e. Atilde - 1)
@@ -104,7 +113,9 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     for (j in seq(1,nx))
       {
         rj = r[,j, drop=FALSE]
-        P  <- ( mux[j,] - t(rj) %*% R1X )
+        # bug corrected on Fri Nov 14 22:48:46 CET 2014
+        # R1X below -> R1tX
+        P  <- ( mux[j,] - t(rj) %*% R1tX )
         cxx = rr - (t(rj) %*% solve(Rt, rj)) + P %*%  solve ( dummy1 , t(P) )  
         Sp_diag[j] = sigma_hat_2 * cxx 
       }
@@ -114,6 +125,7 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
       Emul_pred = list(yp=yp, Sp_diag = Sp_diag, yp_mean=yp_mean, yp_gaus=yp_gaus)
   }
 
-  return(Emul_pred)
-
 }
+
+
+
