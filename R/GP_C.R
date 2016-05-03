@@ -4,6 +4,23 @@
 # we won't use sparse matrices
 # exp <- function(x) Vectorize({ifelse(x<(-2), 0, .Primitive("exp")(x)) })
 
+matern <- function(nu)
+{
+  require(gsl)
+  if (nu > 100) return(exp) 
+  
+  covar <- function(x) 
+  # uses will normall supply the minus squared distance
+  {
+    d = sqrt(-x)*2.
+    if (d < 1.e-5) return (1)
+    dn =  sqrt(nu)*d 
+    2^(1-nu)/ gsl_sf_gamma(nu) * dn^nu * bessel_Knu ( nu, dn )
+  }
+
+  Vectorize(covar)
+}
+
 cov_mat	= function(lambda=lambda,X1=X1,X2=X2, covar=exp)
 {
   # requires lambda to be a vector
@@ -38,20 +55,30 @@ function( X, Y ,lambda, regress='linear', covar=exp )
   # 4.10.2013 : added covar option + passed in output.
   #             Backward campatible.
 {
+  if (is.character(regress))
+  {
   funcmu = get(sprintf('funcmu_%s',regress))
   if  ( ! is.function(funcmu)) stop ('invalid regression model')
   if  ( ! is.matrix(Y)) Y=t(t(Y))
   if  ( ! is.matrix(X)) X=t(t(X))
+  }
+  else if (is.function(regress))
+  {
+  if (is.function(regress)) funcmu = regress
+  }
+  else stop('regress must either be a string or a function')
 
 	muX  = t(apply(X, 1, funcmu))
   # note : if only a single row gets out of this this
   # probably means that muX is in fact a constant
   if ( nrow(muX) == 1) muX = (t(muX))
+  
+  nq   <- ncol(muX)
 
 	n    <- nrow(X)      
 	nn   <- ncol(X)
-	nbr  <- n - ncol(X)
-	nbrr <- n - ncol(X) - 2 
+	nbr  <- n - nq
+	nbrr <- n - nq - 2 
 	
 	R   <- cov_mat(lambda,X,X,covar) 
   # R1X <- solve(R,muX) # for P matrix, disgarding the nugget
@@ -116,4 +143,4 @@ BIC.GP_Emul <- function(E)
     return(bic)
   }
 
-logLik.GP_Emul <- function(E) E$log_REML
+

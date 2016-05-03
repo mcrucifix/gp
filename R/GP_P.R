@@ -44,6 +44,9 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
   {
     rr <-  if ((nx)==1) {1}   else {cov_mat(lambda,x ,x,covar)}
 
+    # save a copy of nugget-free covariance
+    rr_nuggetfree <- rr
+
     rr <- rr + diag(nx) * lambda$nugget
     # correction : the nugget must not only be added to the diag, but in fact
     # to any couple of inputs that would be identical 
@@ -64,12 +67,17 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
     ## in the notation Oakley OHagan : 
 
    
-    cxx_star = rr -  t(r) %*% solve ( Rt, r ) + 
-             ( P  %*% solve ( (t(muX) %*% R1tX )  ,  t(P) ) )
+    cxx0 <- -  t(r) %*% solve ( Rt, r ) + ( P  %*% solve ( (t(muX) %*% R1tX )  ,  t(P) ) )
+
+    cxx_star = rr  + cxx0
+    cxx_star_nuggetfree = rr_nuggetfree  + cxx0
 
     Sp = cxx_star * as.numeric(sigma_hat_2)
+    Sp_nuggetfree = cxx_star_nuggetfree * as.numeric(sigma_hat_2)
 
     Sp_diag = diag(Sp)
+    Sp_diag_nuggetfree = diag(Sp_nuggetfree)
+
     if (extra_output)
     {
       # extra output useful to compute the triple integrals fro
@@ -94,7 +102,7 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
  
       mux = as.matrix(mux)
       r = as.matrix(r)
-      Emul_pred = list(yp=yp, yp_mean=yp_mean, yp_gaus=yp_gaus, Sp=Sp, Sp_diag = Sp_diag, r=r, ht=mux, 
+      Emul_pred = list(yp=yp, yp_mean=yp_mean, yp_gaus=yp_gaus, Sp=Sp, Sp_nuggetfree = Sp_nuggetfree, Sp_diag = Sp_diag, Sp_diag_nuggetfree = Sp_diag_nuggetfree, r=r, ht=mux, 
                        cxx = rr, 
                        cxx_star = cxx_star,
                        hht = aperm ( outer(t(mux), mux) , c(2,3,1,4) ),
@@ -103,26 +111,32 @@ function( EM_Cali, x, calc_var=FALSE, extra_output=FALSE)
                        )
     }
     else 
-    Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, yp_mean=yp_mean, yp_gaus=yp_gaus)
+    Emul_pred = list(yp=yp, Sp=Sp, Sp_diag = Sp_diag, 
+     Sp_diag_nuggetfree, yp_mean=yp_mean, yp_gaus=yp_gaus)
 
   } else
   {
-    rr =  1 + lambda$nugget
+    rr_nuggetfree = 1.
+    rr =  rr_nuggetfree + lambda$nugget
     dummy1 = (t(muX) %*% R1tX ) 
     Sp_diag=rep(0,nx)
+    Sp_diag_nuggetfree=rep(0,nx)
     for (j in seq(1,nx))
       {
         rj = r[,j, drop=FALSE]
         # bug corrected on Fri Nov 14 22:48:46 CET 2014
         # R1X below -> R1tX
         P  <- ( mux[j,] - t(rj) %*% R1tX )
-        cxx = rr - (t(rj) %*% solve(Rt, rj)) + P %*%  solve ( dummy1 , t(P) )  
+        cxx0 = - (t(rj) %*% solve(Rt, rj)) + P %*%  solve ( dummy1 , t(P) )  
+        cxx = rr + cxx0
+        cxx_nuggetfree = rr_nuggetfree + cxx0
         Sp_diag[j] = sigma_hat_2 * cxx 
+        Sp_diag_nuggetfree[j] = sigma_hat_2 * cxx_nuggetfree
       }
     if (extra_output) 
-      Emul_pred = list(yp=yp, Sp_diag=Sp_diag, ht=mux, tt=t(r))
+      Emul_pred = list(yp=yp, Sp_diag=Sp_diag, Sp_diag_nuggetfree = Sp_diag_nuggetfree, ht=mux, tt=t(r))
     else 
-      Emul_pred = list(yp=yp, Sp_diag = Sp_diag, yp_mean=yp_mean, yp_gaus=yp_gaus)
+      Emul_pred = list(yp=yp, Sp_diag = Sp_diag,  Sp_diag_nuggetfree = Sp_diag_nuggetfree, yp_mean=yp_mean, yp_gaus=yp_gaus)
   }
 
 }

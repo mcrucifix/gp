@@ -25,7 +25,7 @@ function( X, Y ,lambda, ... )
 plot.L1O <- function(L1O, ...)
 {
    with(L1O, errbar (Yi, mean, mean-sd, mean+sd , ... ) )
-   a1  <- min(L1O$mean)
-   a2  <- max(L1O$mean)
-   lines (c(a1,a2), c(a1,a2), lty=2 ) 
+   a1  <- min(c(L1O$mean, Yi))
+   a2  <- max(c(L1O$mean, Yi))
+   lines (c(a1,a2), c(a1,a2), lty=2 , col='red') 
 }

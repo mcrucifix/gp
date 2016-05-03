@@ -1,7 +1,11 @@
-0.1.5 : BUG FIX !!! In the computation of the likelihood : the multiplying
+0.1.6 : BUG FIX !!! In the computation of the likelihood : the multiplying
         factor of log(sigma) is (n-q) where q is the number of column
         of regressors, not X. It is quite likely without much consequence
         on previously published results. 
-        GP_E now generates a class, associated with bic and lik functions
+        GP_C now generates a class, associated with bic and lik functions
+        GP_P : added also Sp_diag_nugetfree and Sp_nuggetfree, corrseponding
+        to posterior variances without nugget, i.e. variance associated with
+        the process itself
+        implement Matern function (and checked)
 0.1.5 : pca : check that all elements of all experiemnts are !na
 0.1.3 : dropped parameter 'x' in varanal 
