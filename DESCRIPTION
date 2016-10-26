@@ -1,8 +1,8 @@
 Package: GP
 Type: GaussianProcess
 Title: Gaussian process calibration for emulation
-Version: 0.1.6
-Date: 2014-04-11
+Version: 0.1.7
+Date: 2016-05-04
 Author: Michel Crucifix and Nabila Bounceur
 Depends: Hmisc
 Maintainer: Michel Crucifx <michel.crucifix@uclouvain.be>

@@ -135,6 +135,13 @@ function( X, Y ,lambda, regress='linear', covar=exp )
 }
 
 
+logLik.GP_Emul <- function(E) 
+  {
+    return(E$log_REML)
+  }
+
+
+
 BIC.GP_Emul <- function(E) 
   {
     k <- with(E, length(lambda$theta) + length(lambda$nugget))

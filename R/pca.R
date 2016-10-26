@@ -9,25 +9,24 @@ function(A)
 
   A = matrix(A, nlon*nlat, nr)
 
-  mean = apply(A,1,mean)
-  Am = sweep( A,1, mean ) 
+  means = apply(A,1,meanrm)
+  Am = sweep( A,1, means) 
 
-  o = which( ! is.na (mean ) )
+  o = which( ! is.na (means ) )
 
   U = svd(Am[o,])
 
   O = A*NA 
-  V = O 
   O[o,] = U$u
 
   O = array(O, c(nlon,nlat,nr))
 
   # reformatting 
 
-  mean = matrix(mean, nlon, nlat)
+  means = matrix(means, nlon, nlat)
 
   d     = U$d
 
-  return(list(mean=mean, PCA=O, amps = U$v, d=d))
+  return(list(mean=means, PCA=O, amps = U$v, d=d))
 
 }
