@@ -60,7 +60,7 @@ plot.L1O <- function(L1O, extended=FALSE, rescale = FALSE, ilog = FALSE, ...)
      qqnorm( (mean - Yi) / sd)    # should be a straight line
      lines(c(cmin,cmax), c(cmin,cmax), lty=2)
 
-     plot(mean, (mean - Yi) / sd , main = "standard error")
+     plot(mean, (mean - Yi) / sd , main = "standard error", ...)
      abline(h=0, lty=2, col='blue')
      text (cmin+dc*0.6, cmin+dc*0.9, sprintf('p = %.2f',k$p.value), pos = 4)
    } else 
